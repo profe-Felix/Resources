@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>PDF → PNG Page Export</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<style>
+  body { font-family: sans-serif; padding: 20px; }
+  input { width: 400px; padding: 6px; }
+</style>
+</head>
+<body>
+
+<h2>Export PDF Page as PNG</h2>
+
+PDF URL:<br>
+<input id="pdfUrl" value="https://profe-felix.github.io/Resources/Kinder_Aprende_y_demuestra_combined.pdf" /><br><br>
+
+Page number:<br>
+<input id="pageNum" type="number" value="100" /><br><br>
+
+<button onclick="renderPage()">Get PNG</button>
+
+<br><br>
+<img id="output" style="max-width:100%; border:1px solid #ccc" />
+
+<script>
+async function renderPage() {
+  const url = document.getElementById("pdfUrl").value;
+  const pageNum = parseInt(document.getElementById("pageNum").value);
+
+  const pdf = await pdfjsLib.getDocument(url).promise;
+  const page = await pdf.getPage(pageNum);
+
+  const viewport = page.getViewport({ scale: 2 }); // increase for higher quality
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+
+  await page.render({ canvasContext: context, viewport }).promise;
+
+  document.getElementById("output").src = canvas.toDataURL("image/png");
+}
+</script>
+
+</body>
+</html>
